@@ -1,5 +1,6 @@
 package com.example.findmytimezone
 
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
@@ -19,12 +20,15 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
 
     private var seekBarView: SeekBar? = null
     private var userTimeView: TextView? = null
-    private var localDate: Date = Date()
     private var dateButtonView: Button? = null
     private var timeZoneButtonView: Button? = null
     private var convertedDateView: TextView? = null
-    private var calendar = Calendar.getInstance()
 
+    private var localDate: Date = Date()
+    private var calendar = Calendar.getInstance()
+    private var userTimeZone: TimeZone? = null
+
+    private var CHOOSE_TIME_ZONE_REQUEST_CODE = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,15 +47,25 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
     private fun updateDateInView() {
         val myFormat = "MM/dd/yyyy"
         val sdf = SimpleDateFormat(myFormat, Locale.US)
-        dateButton?.text = sdf.format(calendar.time)
+        dateButtonView?.text = sdf.format(calendar.time)
     }
 
     //timezone button click
     fun chooseTimezone(view: View) {
         val intent = Intent(this, TimeZoneActivity::class.java)
-        startActivity(intent)
+//        startActivity(intent)
+        startActivityForResult(intent, CHOOSE_TIME_ZONE_REQUEST_CODE)
+
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == CHOOSE_TIME_ZONE_REQUEST_CODE && resultCode == Activity.RESULT_OK) run {
+            val timeZoneData: String = data!!.getStringExtra("timezone")
+            timeZoneButtonView!!.text = timeZoneData
+            userTimeZone = TimeZone.getTimeZone(timeZoneData)
+        }
+    }
 
     //dateButtonView click
     override fun onClick(view: View?) {
