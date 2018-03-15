@@ -1,6 +1,7 @@
 package com.example.findmytimezone
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -19,7 +20,8 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
     private var seekBarView: SeekBar? = null
     private var userTimeView: TextView? = null
     private var localDate: Date = Date()
-    private var dateBtn: Button? = null
+    private var dateButtonView: Button? = null
+    private var timeZoneButtonView: Button? = null
     private var convertedDateView: TextView? = null
     private var calendar = Calendar.getInstance()
 
@@ -30,20 +32,28 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
 
         userTimeView = this.userTime
         seekBarView = this.seekBar
-        dateBtn = this.dateButton
+        dateButtonView = this.dateButton
+        timeZoneButtonView = this.timeZoneButton
         convertedDateView = this.convertedDate
 
         seekBarView!!.setOnSeekBarChangeListener(this)
-        dateBtn?.setOnClickListener(this)
+        dateButtonView?.setOnClickListener(this)
     }
 
     private fun updateDateInView() {
         val myFormat = "MM/dd/yyyy"
         val sdf = SimpleDateFormat(myFormat, Locale.US)
-        convertedDateView?.text = sdf.format(calendar.time)
+        dateButton?.text = sdf.format(calendar.time)
+    }
+
+    //timezone button click
+    fun chooseTimezone(view: View) {
+        val intent = Intent(this, TimeZoneActivity::class.java)
+        startActivity(intent)
     }
 
 
+    //dateButtonView click
     override fun onClick(view: View?) {
         val dateSetListener = DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
             calendar.set(Calendar.YEAR, year)
@@ -58,6 +68,7 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
                 calendar.get(Calendar.DAY_OF_MONTH)).show()
     }
 
+    //seekBar interactions
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
         val progressText: String? = if (progress < 10) {
             "0" + progress.toString()
