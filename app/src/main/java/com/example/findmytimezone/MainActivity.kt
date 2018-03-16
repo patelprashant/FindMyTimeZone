@@ -6,10 +6,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-import android.widget.Button
-import android.widget.SeekBar
+import android.widget.*
 import android.widget.SeekBar.OnSeekBarChangeListener
-import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,10 +21,16 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
     private var dateButtonView: Button? = null
     private var timeZoneButtonView: Button? = null
     private var convertedDateView: TextView? = null
+    private var convertedTimeView: TextView? = null
+    private var listViewMainView: ListView? = null
 
     private var localDate: Date = Date()
     private var calendar = Calendar.getInstance()
     private var userTimeZone: TimeZone? = null
+
+    var selectedTimezonesMain = arrayOf("Europe/Bucharest", "Europe/London", "Europe/Paris")
+    var selectedTimeZoneMain: TimeZone? = null
+
 
     private var CHOOSE_TIME_ZONE_REQUEST_CODE = 1
 
@@ -39,9 +43,17 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
         dateButtonView = this.dateButton
         timeZoneButtonView = this.timeZoneButton
         convertedDateView = this.convertedDate
+        convertedTimeView = this.convertedTime
+        listViewMainView = this.listViewMain
 
         seekBarView!!.setOnSeekBarChangeListener(this)
         dateButtonView?.setOnClickListener(this)
+
+        val adapterMain = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, selectedTimezonesMain)
+        listViewMainView?.adapter = adapterMain
+        listViewMainView!!.onItemClickListener = AdapterView.OnItemClickListener{ adapterView, view, i, l ->
+            selectedTimeZoneMain = TimeZone.getTimeZone(selectedTimezonesMain[i])
+        }
     }
 
     private fun updateDateInView() {
