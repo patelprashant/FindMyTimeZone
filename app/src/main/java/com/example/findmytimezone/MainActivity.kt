@@ -12,6 +12,11 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
+
+
+
+
 
 
 class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickListener {
@@ -50,12 +55,24 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
         seekBarView!!.setOnSeekBarChangeListener(this)
         dateButtonView?.setOnClickListener(this)
 
+        setupListViewAdapter()
+        listViewMainView!!.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->
+            selectedTimeZoneMain = TimeZone.getTimeZone(selectedTimezonesMain[i])
+            convertTimeZoneData(userTimeZone, selectedTimeZoneMain)
+        }
+    }
+
+    fun selectTimezones(view: View) {
+        val bundle = Bundle()
+        bundle.putStringArrayList("selectedTimezones", ArrayList(Arrays.asList(selectedTimezonesMain[0])))
+        val intent = Intent(this, SelectTimezonesActivity::class.java)
+        intent.putExtra("selectedTimezonesBundle", bundle)
+        startActivityForResult(intent, 2)
+    }
+
+    private fun setupListViewAdapter() {
         val adapterMain = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, selectedTimezonesMain)
         listViewMainView?.adapter = adapterMain
-        listViewMainView!!.onItemClickListener = AdapterView.OnItemClickListener{ adapterView, view, i, l ->
-            selectedTimeZoneMain = TimeZone.getTimeZone(selectedTimezonesMain[i])
-            convertTimeZoneData(userTimeZone,selectedTimeZoneMain)
-        }
     }
 
 
@@ -78,7 +95,7 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
         val myFormat = "MM/dd/yyyy"
         val sdf = SimpleDateFormat(myFormat, Locale.US)
         dateButtonView?.text = sdf.format(calendar.time)
-        convertTimeZoneData(userTimeZone,selectedTimeZoneMain)
+        convertTimeZoneData(userTimeZone, selectedTimeZoneMain)
     }
 
     //timezone button click
@@ -95,7 +112,7 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
             timeZoneButtonView!!.text = timeZoneData
             userTimeZone = TimeZone.getTimeZone(timeZoneData)
         }
-        convertTimeZoneData(userTimeZone,selectedTimeZoneMain)
+        convertTimeZoneData(userTimeZone, selectedTimeZoneMain)
     }
 
     //dateButtonView click
@@ -127,7 +144,7 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
             localDate.minutes = 0
         }
         seekBar?.progress = localDate.hours
-        convertTimeZoneData(userTimeZone,selectedTimeZoneMain)
+        convertTimeZoneData(userTimeZone, selectedTimeZoneMain)
     }
 
     override fun onStartTrackingTouch(seekBar: SeekBar?) {
