@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.*
 import android.widget.SeekBar.OnSeekBarChangeListener
 import kotlinx.android.synthetic.main.activity_main.*
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -53,6 +54,23 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
         listViewMainView?.adapter = adapterMain
         listViewMainView!!.onItemClickListener = AdapterView.OnItemClickListener{ adapterView, view, i, l ->
             selectedTimeZoneMain = TimeZone.getTimeZone(selectedTimezonesMain[i])
+            convertTimeZoneData(userTimeZone,selectedTimeZoneMain)
+        }
+    }
+
+
+    private fun convertTimeZoneData(fromTimeZone: TimeZone?, toTimeZone: TimeZone?) {
+        if (fromTimeZone != null && toTimeZone != null) {
+            val fromOffset = fromTimeZone.getOffset(localDate.time)
+            val toOffset = toTimeZone.getOffset(localDate.time)
+            val convertedTime = localDate.time - (fromOffset - toOffset)
+            val convertedDate = Date(convertedTime)
+            val hours = convertedDate.hours
+            val minutes = convertedDate.minutes
+            val time = ((if (hours < 10) "0" + Integer.toString(hours) else Integer.toString(hours))
+                    + ":" + if (minutes < 10) "0" + Integer.toString(minutes) else Integer.toString(minutes))
+            convertedTimeView?.text = time
+            convertedDateView?.text = (DateFormat.getDateInstance().format(convertedDate))
         }
     }
 
@@ -60,6 +78,7 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
         val myFormat = "MM/dd/yyyy"
         val sdf = SimpleDateFormat(myFormat, Locale.US)
         dateButtonView?.text = sdf.format(calendar.time)
+        convertTimeZoneData(userTimeZone,selectedTimeZoneMain)
     }
 
     //timezone button click
@@ -67,7 +86,6 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
         val intent = Intent(this, TimeZoneActivity::class.java)
 //        startActivity(intent)
         startActivityForResult(intent, CHOOSE_TIME_ZONE_REQUEST_CODE)
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -77,6 +95,7 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
             timeZoneButtonView!!.text = timeZoneData
             userTimeZone = TimeZone.getTimeZone(timeZoneData)
         }
+        convertTimeZoneData(userTimeZone,selectedTimeZoneMain)
     }
 
     //dateButtonView click
@@ -108,6 +127,7 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
             localDate.minutes = 0
         }
         seekBar?.progress = localDate.hours
+        convertTimeZoneData(userTimeZone,selectedTimeZoneMain)
     }
 
     override fun onStartTrackingTouch(seekBar: SeekBar?) {
