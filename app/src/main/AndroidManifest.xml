@@ -17,7 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".TimeZoneActivity" />
-        <activity android:name=".SelectTimezonesActivity"></activity>
+        <activity android:name=".SelectTimezonesActivity" />
     </application>
 
 </manifest>

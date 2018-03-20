@@ -15,10 +15,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-
-
-
-
 class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickListener {
 
 
@@ -38,7 +34,8 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
     var selectedTimeZoneMain: TimeZone? = null
 
 
-    private var CHOOSE_TIME_ZONE_REQUEST_CODE = 1
+    private val CHOOSE_TIME_ZONE_REQUEST_CODE = 1
+    private val SELECT_TIME_ZONES_REQUEST_CODE = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,6 +109,16 @@ class MainActivity : AppCompatActivity(), OnSeekBarChangeListener, View.OnClickL
             timeZoneButtonView!!.text = timeZoneData
             userTimeZone = TimeZone.getTimeZone(timeZoneData)
         }
+
+        if (requestCode == SELECT_TIME_ZONES_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            val bundle = data!!.getBundleExtra("selectedTimezonesBundle")
+            val selectedTimezonesArrayList = bundle.getStringArrayList("selectedTimezones")
+            selectedTimezonesArrayList.sortWith(Comparator { s, t1 -> s.compareTo(t1, ignoreCase = true) })
+            selectedTimezonesMain = Array(selectedTimezonesArrayList.size) { "it = $it" }
+            selectedTimezonesArrayList.toArray(selectedTimezonesMain)
+            setupListViewAdapter()
+        }
+
         convertTimeZoneData(userTimeZone, selectedTimeZoneMain)
     }
 
